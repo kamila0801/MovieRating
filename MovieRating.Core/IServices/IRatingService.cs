@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MovieRating
+namespace MovieRating.IServices
 {
     public interface IRatingService
     {

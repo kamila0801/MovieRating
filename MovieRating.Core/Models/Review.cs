@@ -1,6 +1,6 @@
 using System;
 
-namespace MovieRating
+namespace MovieRating.Models
 {
     public class Review
     {
