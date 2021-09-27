@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieRating.Domain", "Movie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieRating.Data", "MovieRating.Data\MovieRating.Data.csproj", "{F56BC3AC-06E2-4332-8E86-9810E6921B8D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieRating.Test", "MovieRating.Test\MovieRating.Test.csproj", "{C5EB94A3-57FB-4FE1-9086-5A94D3D912AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,10 @@ Global
 		{F56BC3AC-06E2-4332-8E86-9810E6921B8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F56BC3AC-06E2-4332-8E86-9810E6921B8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F56BC3AC-06E2-4332-8E86-9810E6921B8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5EB94A3-57FB-4FE1-9086-5A94D3D912AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5EB94A3-57FB-4FE1-9086-5A94D3D912AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5EB94A3-57FB-4FE1-9086-5A94D3D912AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5EB94A3-57FB-4FE1-9086-5A94D3D912AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{69613E71-3E4B-405C-A068-2FE0F109D3A4} = {37F13622-297E-40D3-9B12-36E95753E968}

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using MovieRating.IServices;
 
 namespace MovieRating.Domain.Services
@@ -32,9 +33,16 @@ namespace MovieRating.Domain.Services
             throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// We need that method in 9 to 11
+        /// </summary>
+        /// <param name="movie"></param>
+        /// <returns></returns>
         public double GetAverageRateOfMovie(int movie)
         {
-            throw new System.NotImplementedException();
+            return _repo.ReadAll().Where(m => m.Movie == movie).
+                Select(x => x.Grade).Average();
+
         }
 
         public int GetNumberOfRates(int movie, int rate)
@@ -51,20 +59,23 @@ namespace MovieRating.Domain.Services
         {
             throw new System.NotImplementedException();
         }
-
+        
         public List<int> GetTopRatedMovies(int amount)
         {
-            throw new System.NotImplementedException();
+            return _repo.ReadAll().OrderByDescending(n => GetAverageRateOfMovie(n.Movie)).
+                Select(x => x.Movie).Take(amount).ToList();
         }
 
         public List<int> GetTopMoviesByReviewer(int reviewer)
         {
-            throw new System.NotImplementedException();
+            return _repo.ReadAll().Where(n => n.Reviewer==reviewer).OrderByDescending(n => GetAverageRateOfMovie(n.Movie))
+                .ThenByDescending(n => n.ReviewDate).Select(x => x.Movie).ToList();
         }
 
         public List<int> GetReviewersByMovie(int movie)
         {
-            throw new System.NotImplementedException();
+            return _repo.ReadAll().Where(n => n.Movie == movie).OrderByDescending(n => GetAverageRateOfMovie(n.Movie))
+                .ThenByDescending(n => n.ReviewDate).Select(x => x.Reviewer).ToList();
         }
     }
 }
