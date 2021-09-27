@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using MovieRating.Models;
 
-namespace MovieRating
+namespace MovieRating.Data.Repositories
 {
     public class ReviewRepository : IReviewRepository
     {

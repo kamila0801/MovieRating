@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MovieRating.Models;
 
 namespace MovieRating
 {

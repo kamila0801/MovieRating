@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using MovieRating.IServices;
 
-namespace MovieRating
+namespace MovieRating.Domain.Services
 {
     public class RatingService : IRatingService
     {
