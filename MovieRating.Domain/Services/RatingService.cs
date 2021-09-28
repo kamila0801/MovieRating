@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -123,18 +124,24 @@ namespace MovieRating.Domain.Services
         
         public List<int> GetTopRatedMovies(int amount)
         {
+            if (amount < 1)
+                throw new ArgumentException("amount must be greater than 0");
             return _repo.ReadAll().OrderByDescending(n => GetAverageRateOfMovie(n.Movie)).
                 Select(x => x.Movie).Take(amount).ToList();
         }
 
         public List<int> GetTopMoviesByReviewer(int reviewer)
         {
+            if (_repo.ReadAll().FirstOrDefault(n => n.Reviewer == reviewer) == null)
+                throw new ArgumentException("reviewer doesnt exist");
             return _repo.ReadAll().Where(n => n.Reviewer==reviewer).OrderByDescending(n => GetAverageRateOfMovie(n.Movie))
                 .ThenByDescending(n => n.ReviewDate).Select(x => x.Movie).ToList();
         }
 
         public List<int> GetReviewersByMovie(int movie)
         {
+            if (_repo.ReadAll().FirstOrDefault(n => n.Movie == movie) == null)
+                throw new ArgumentException("movie doesnt exist");
             return _repo.ReadAll().Where(n => n.Movie == movie).OrderByDescending(n => GetAverageRateOfMovie(n.Movie))
                 .ThenByDescending(n => n.ReviewDate).Select(x => x.Reviewer).ToList();
         }

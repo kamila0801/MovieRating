@@ -230,5 +230,61 @@ namespace MovieRating.Test
             Assert.True(reviewersForMovie.ElementAt(1)==rev1.Reviewer);
             Assert.True(reviewersForMovie.ElementAt(2)==rev3.Reviewer);
         }
+
+        #region Invalid Arguments
+
+        [Fact]
+        public void GetTopRatedMovies_Should_Throw_Exception_WhenParameter_IsZeroOrLess()
+        {
+            _mockRepo.Setup(x => x.ReadAll()).Returns(new List<Review>());
+            void Act1() => _service.GetTopRatedMovies(0);
+            void Act2() => _service.GetTopRatedMovies(-10);
+            var exception1 = Assert.Throws<ArgumentException>(Act1);
+            var exception2 = Assert.Throws<ArgumentException>(Act2);
+            Assert.Equal("amount must be greater than 0", exception1.Message);
+            Assert.Equal("amount must be greater than 0", exception2.Message);
+        }
+
+        [Fact]
+        public void GetTopMoviesByReviewer_ShouldThrowException_When_ReviewerDoesnt_Exist()
+        {
+            _mockRepo.Setup(x => x.ReadAll()).Returns(new List<Review>());
+            void Act1() => _service.GetTopMoviesByReviewer(0);
+            var exception1 = Assert.Throws<ArgumentException>(Act1);
+            Assert.Equal("reviewer doesnt exist", exception1.Message);
+        }
+        
+        
+        [Fact]
+        public void GetReviewersByMovie_ShouldThrowException_IfMovieDoesntExist()
+        {
+            //Arrange
+            var rev1 = new Review
+            {
+                Grade = 3,
+                Movie = 1,
+                Reviewer = 1,
+                ReviewDate = new DateTime(2021, 4, 23)
+            };
+            var rev2 = new Review
+            {
+                Grade = 5,
+                Movie = 1,
+                Reviewer = 2,
+                ReviewDate = new DateTime(2021, 5, 23)
+            };
+            var list = new List<Review>() {rev1, rev2};
+            _mockRepo.Setup(x => x.ReadAll()).Returns(list);
+            //Act
+            void Act() => _service.GetReviewersByMovie(100);
+            //Assert
+            var exception1 = Assert.Throws<ArgumentException>(Act);
+            Assert.Equal("movie doesnt exist", exception1.Message);
+        }
+        
+
+        #endregion
+        
+        
     }
 }
