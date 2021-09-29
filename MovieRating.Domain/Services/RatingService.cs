@@ -102,24 +102,71 @@ namespace MovieRating.Domain.Services
         /// <returns></returns>
         public double GetAverageRateOfMovie(int movie)
         {
-            return _repo.ReadAll().Where(m => m.Movie == movie).
-                Select(x => x.Grade).Average();
-
+            if(!_repo.ReadAll().Any(m => m.Movie == movie))
+                throw new ArgumentException("There is no movie with this id");
+            return _repo.ReadAll().Where(m => m.Movie == movie)
+                .Select(x => x.Grade).Average();
         }
 
         public int GetNumberOfRates(int movie, int rate)
         {
-            throw new System.NotImplementedException();
+            if (!_repo.ReadAll().Any(r=>r.Movie == movie))
+                throw new ArgumentException("There is no movie with this id");
+            if (!_repo.ReadAll().Any(r=>r.Grade == rate))
+                throw new ArgumentException("The rate must be a number between 1 and 5");
+            return _repo.ReadAll().Where(r => r.Movie == movie && r.Grade == rate)
+                .ToList().Count;
         }
 
         public List<int> GetMoviesWithHighestNumberOfTopRates()
         {
-            throw new System.NotImplementedException();
+            var list = _repo.ReadAll().Where(r => r.Grade == 5)
+                .GroupBy(r => r.Movie)
+                .Select(group => new { 
+                    Metric = group.Key, 
+                    Count = group.Count() 
+                })
+                .OrderByDescending(g => g.Count)
+                .ToList();
+            
+            if (!list.Any())
+                return null;
+            
+            var results = new List<int> {list[0].Metric};
+
+            for (int i = 1; i < list.Count; i++)
+            {
+                if(list[i].Count == list[0].Count)
+                   results.Add(list[i].Metric); 
+                else break;
+            }
+            return results;
         }
 
         public List<int> GetMostProductiveReviewers()
         {
-            throw new System.NotImplementedException();
+            var list = _repo.ReadAll()
+                .GroupBy(r => r.Reviewer)
+                .Select(group => new { 
+                    Metric = group.Key, 
+                    Count = group.Count() 
+                })
+                .OrderByDescending(g => g.Count)
+                .ToList();
+            
+            if (!list.Any())
+                return null;
+            
+            var results = new List<int> {list[0].Metric};
+            
+            for (int i = 1; i < list.Count; i++)
+            {
+                if(list[i].Count == list[0].Count)
+                    results.Add(list[i].Metric); 
+                else break;
+            }
+            return results;
+            
         }
         
         public List<int> GetTopRatedMovies(int amount)

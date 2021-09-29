@@ -286,5 +286,389 @@ namespace MovieRating.Test
         #endregion
         
         
+
+        [Fact]
+        public void GetAverageRateOfMovie_InvalidArgument()
+        {
+            var review1 = new Review
+            {
+                Movie = 1,
+                Grade = 1,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var list = new List<Review>();
+            list.Add(review1);
+            
+            _mockRepo.Setup(r => r.ReadAll()).Returns(list);
+            
+            var ex = Assert.Throws<ArgumentException>(() => _service.GetAverageRateOfMovie(2));
+            Assert.Equal("There is no movie with this id", ex.Message);
+        }
+        
+        [Fact]
+        public void GetAverageRateOfMovie_ValidArgument()
+        {
+            var review1 = new Review
+            {
+                Movie = 1,
+                Grade = 1,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review2 = new Review
+            {
+                Movie = 1,
+                Grade = 3,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 2
+            };
+            var review3 = new Review
+            {
+                Movie = 1,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review4 = new Review
+            {
+                Movie = 2,
+                Grade = 1,
+                ReviewDate = new DateTime(2020, 7, 6),
+                Reviewer = 2
+            };
+            var list = new List<Review>()
+            {
+                review1, review2, review3, review4
+            };
+            
+            _mockRepo.Setup(r => r.ReadAll()).Returns(list);
+            
+            Assert.Equal(3, _service.GetAverageRateOfMovie(1));
+        }
+
+        [Fact]
+        public void GetNumberOfRates_InvalidMovieArgument()
+        {
+            var review1 = new Review
+            {
+                Movie = 1,
+                Grade = 1,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var list = new List<Review>();
+            list.Add(review1);
+            
+            _mockRepo.Setup(r => r.ReadAll()).Returns(list);
+            
+            var ex = Assert.Throws<ArgumentException>(() => _service.GetNumberOfRates(2, 3));
+            Assert.Equal("There is no movie with this id", ex.Message);
+        }
+        
+        [Fact]
+        public void GetNumberOfRates_InvalidRateArgument()
+        {
+            var review1 = new Review
+            {
+                Movie = 1,
+                Grade = 1,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var list = new List<Review>();
+            list.Add(review1);
+            
+            _mockRepo.Setup(r => r.ReadAll()).Returns(list);
+            
+            var ex = Assert.Throws<ArgumentException>(() => _service.GetNumberOfRates(1, 10));
+            Assert.Equal("The rate must be a number between 1 and 5", ex.Message);
+        }
+        
+        [Fact]
+        public void GetNumberOfRates_ValidArgument()
+        {
+            var review1 = new Review
+            {
+                Movie = 1,
+                Grade = 1,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review2 = new Review
+            {
+                Movie = 1,
+                Grade = 3,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 2
+            };
+            var review3 = new Review
+            {
+                Movie = 1,
+                Grade = 3,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review4 = new Review
+            {
+                Movie = 2,
+                Grade = 1,
+                ReviewDate = new DateTime(2020, 7, 6),
+                Reviewer = 2
+            };
+            var list = new List<Review>()
+            {
+                review1, review2, review3, review4
+            };
+            
+            _mockRepo.Setup(r => r.ReadAll()).Returns(list);
+            
+            Assert.Equal(2, _service.GetNumberOfRates(1,3));
+        }
+
+        [Fact]
+        public void GetMoviesWithHighestNumberOfTopRates_NoHighRatings()
+        {
+            var review1 = new Review
+            {
+                Movie = 1,
+                Grade = 1,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review2 = new Review
+            {
+                Movie = 2,
+                Grade = 3,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review3 = new Review
+            {
+                Movie = 2,
+                Grade = 2,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var list = new List<Review>()
+            {
+                review1, review2, review3
+            };
+            
+            _mockRepo.Setup(r => r.ReadAll()).Returns(list);
+            
+            Assert.Null(_service.GetMoviesWithHighestNumberOfTopRates());
+        }
+        
+        [Fact]
+        public void GetMoviesWithHighestNumberOfTopRates_SingleResult()
+        {
+            var review1 = new Review
+            {
+                Movie = 1,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review2 = new Review
+            {
+                Movie = 1,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review3 = new Review
+            {
+                Movie = 2,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var review4 = new Review
+            {
+                Movie = 2,
+                Grade = 4,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var review5 = new Review
+            {
+                Movie = 3,
+                Grade = 4,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var list = new List<Review>()
+            {
+                review1, review2, review3, review4, review5
+            };
+            
+            _mockRepo.Setup(r => r.ReadAll()).Returns(list);
+            var expectedList = new List<int>()
+            {
+                1
+            };
+            
+            Assert.Equal(expectedList, _service.GetMoviesWithHighestNumberOfTopRates());
+            Assert.Equal(expectedList.Count, _service.GetMoviesWithHighestNumberOfTopRates().Count);
+            
+        }
+        
+        [Fact]
+        public void GetMoviesWithHighestNumberOfTopRates_MultipleResult()
+        {
+            var review1 = new Review
+            {
+                Movie = 1,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review2 = new Review
+            {
+                Movie = 1,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review3 = new Review
+            {
+                Movie = 2,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var review4 = new Review
+            {
+                Movie = 2,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var review5 = new Review
+            {
+                Movie = 3,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var list = new List<Review>()
+            {
+                review1, review2, review3, review4, review5
+            };
+            
+            _mockRepo.Setup(r => r.ReadAll()).Returns(list);
+            var expectedList = new List<int>()
+            {
+                1, 2
+            };
+            
+            Assert.Equal(expectedList, _service.GetMoviesWithHighestNumberOfTopRates());
+            Assert.Equal(expectedList.Count, _service.GetMoviesWithHighestNumberOfTopRates().Count);
+            
+        }
+
+        [Fact]
+        public void GetMostProductiveReviewers_SingleResult()
+        {
+            var review1 = new Review
+            {
+                Movie = 1,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review2 = new Review
+            {
+                Movie = 1,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review3 = new Review
+            {
+                Movie = 2,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var review4 = new Review
+            {
+                Movie = 2,
+                Grade = 4,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var review5 = new Review
+            {
+                Movie = 3,
+                Grade = 4,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var list = new List<Review>()
+            {
+                review1, review2, review3, review4, review5
+            };
+            _mockRepo.Setup(r => r.ReadAll()).Returns(list);
+            var expectedList = new List<int>()
+            {
+                3
+            };
+            Assert.Equal(expectedList, _service.GetMostProductiveReviewers());
+            Assert.Equal(expectedList.Count, _service.GetMostProductiveReviewers().Count);
+        }
+        
+        [Fact]
+        public void GetMostProductiveReviewers_MultipleResult()
+        {
+            var review1 = new Review
+            {
+                Movie = 1,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review2 = new Review
+            {
+                Movie = 1,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 1
+            };
+            var review3 = new Review
+            {
+                Movie = 2,
+                Grade = 5,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var review4 = new Review
+            {
+                Movie = 2,
+                Grade = 4,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 3
+            };
+            var review5 = new Review
+            {
+                Movie = 3,
+                Grade = 4,
+                ReviewDate = new DateTime(2020, 6, 6),
+                Reviewer = 2
+            };
+            var list = new List<Review>()
+            {
+                review1, review2, review3, review4, review5
+            };
+            _mockRepo.Setup(r => r.ReadAll()).Returns(list);
+            var expectedList = new List<int>()
+            {
+                1, 3
+            };
+
+            Assert.Equal(expectedList, _service.GetMostProductiveReviewers());
+            Assert.Equal(expectedList.Count, _service.GetMostProductiveReviewers().Count);
+        }
     }
 }
