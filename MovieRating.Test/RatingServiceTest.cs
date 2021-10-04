@@ -5,6 +5,7 @@ using Moq;
 using MovieRating.Domain.Services;
 using MovieRating.IServices;
 using MovieRating.Models;
+using MovieRating.Test.DataGenerators;
 using Xunit;
 
 namespace MovieRating.Test
@@ -20,215 +21,95 @@ namespace MovieRating.Test
             _service = new RatingService(_mockRepo.Object);
         }
 
-        [Fact]
-        public void GetTopRatedMovies_ShouldReturn_N_Movies_WithBestRating()
+        [Theory]
+        [ClassData(typeof(GetTopRatedMoviesGenerator))]
+        public void GetTopRatedMovies_ShouldReturn_N_Movies_WithBestRating(List<Review> list, 
+            int count, int movNo1, int movNo2)
         {
-            //Arrange
-            var rev1 = new Review
-            {
-                Grade = 2,
-                Movie = 1,
-                Reviewer = 1
-            };
-            var rev2 = new Review
-            {
-                Grade = 5,
-                Movie = 2,
-                Reviewer = 1
-            };
-            var rev3 = new Review
-            {
-                Grade = 3,
-                Movie = 3,
-                Reviewer = 1
-            };
-            var list = new List<Review>()
-            {
-                rev1, rev2, rev3
-            };
             _mockRepo.Setup(x => x.ReadAll()).Returns(list);
             //Act
             var movies = _service.GetTopRatedMovies(2);
             //Assert
-            Assert.True(movies.Count==2);
-            Assert.True(movies.ElementAt(0) ==rev2.Movie);
-            Assert.True(movies.ElementAt(1)==rev3.Movie);
+            Assert.True(movies.Count==count);
+            Assert.True(movies.ElementAt(0) ==movNo1);
+            Assert.True(movies.ElementAt(1)==movNo2);
+        }
+        
+        [Theory]
+        [MemberData(nameof(GetTopRatedMoviesGenerator.SpecialCase), MemberType = typeof(GetTopRatedMoviesGenerator))]
+        public void GetTopRatedMovies_ShouldReturn_N_Movies_WithBestRating_TwoMoviesHaveTHisSameRating(List<Review> list, 
+             int movNo1, int movNo2, int movNo3)
+        {
+            _mockRepo.Setup(x => x.ReadAll()).Returns(list);
+            //Act
+            var movies = _service.GetTopRatedMovies(2);
+            //Assert
+            Assert.True(movies.ElementAt(0) ==movNo1);
+            Assert.True(movies.ElementAt(1)==movNo2 ||movies.ElementAt(1)==movNo3 );
         }
 
-        [Fact]
-        public void GetTopMoviesByReviewer_ShouldReturn_MoviesSortedInDescendingOrder_ByRate_AndDate()
+        [Theory]
+        [MemberData(nameof(GetTopMoviesByReviewerGenerator.DataSpecialCase), MemberType = typeof(GetTopMoviesByReviewerGenerator))]
+        public void GetTopMoviesByReviewer_ShouldReturn_MoviesSortedInDescendingOrderSpecialCase_ByRate_AndDate(
+            List<Review> list, int movieNo1, int movieNo2,  int movieNo3)
         {
-            var rev1 = new Review
-            {
-                Grade = 2,
-                Movie = 1,
-                Reviewer = 1,
-                ReviewDate = new DateTime(2021, 4, 23)
-            };
-            //before rev1
-            var rev2 = new Review
-            {
-                Grade = 2,
-                Movie = 2,
-                Reviewer = 1,
-                ReviewDate = new DateTime(2021, 5, 23)
-            };
-            var rev3 = new Review
-            {
-                Grade = 3,
-                Movie = 3,
-                Reviewer = 1,
-                ReviewDate = new DateTime(2021, 2, 22)
-            };
-            var rev4 = new Review
-            {
-                Grade = 3,
-                Movie = 3,
-                Reviewer = 2,
-                ReviewDate = new DateTime(2021, 3, 12)
-            };
-            var list = new List<Review>()
-            {
-                rev1, rev2, rev3, rev4
-            };
             _mockRepo.Setup(x => x.ReadAll()).Returns(list);
             //Act
             var moviesByReviewer = _service.GetTopMoviesByReviewer(1);
             //Assert
-            Assert.True(moviesByReviewer.ElementAt(0)==rev3.Movie);
-            Assert.True(moviesByReviewer.ElementAt(1)==rev2.Movie);
-            Assert.True(moviesByReviewer.ElementAt(2)==rev1.Movie);
+            Assert.True(moviesByReviewer.ElementAt(0)==movieNo1);
+            Assert.True(moviesByReviewer.ElementAt(1)==movieNo2 || moviesByReviewer.ElementAt(1)==movieNo3);
         }
         
-        [Fact]
-        public void GetTopMoviesByReviewer_ShouldReturn_AllMoviesReviewerHasViewed()
+        [Theory]
+        [ClassData(typeof(GetTopMoviesByReviewerGenerator))]
+        public void GetTopMoviesByReviewer_ShouldReturn_MoviesSortedInDescendingOrder_ByRate_AndDate(
+            List<Review> list, int movieNo1, int movieNo2,  int movieNo3)
         {
-            var rev1 = new Review
-            {
-                Grade = 2,
-                Movie = 1,
-                Reviewer = 1,
-                ReviewDate = new DateTime(2021, 4, 23)
-            };
-            var rev2 = new Review
-            {
-                Grade = 5,
-                Movie = 2,
-                Reviewer = 1,
-                ReviewDate = new DateTime(2021, 5, 23)
-            };
-            var rev3 = new Review
-            {
-                Grade = 3,
-                Movie = 3,
-                Reviewer = 1,
-                ReviewDate = new DateTime(2021, 2, 22)
-            };
-            var rev4 = new Review
-            {
-                Grade = 3,
-                Movie = 3,
-                Reviewer = 2,
-                ReviewDate = new DateTime(2021, 3, 12)
-            };
-            var list = new List<Review>()
-            {
-                rev1, rev2, rev3, rev4
-            };
             _mockRepo.Setup(x => x.ReadAll()).Returns(list);
             //Act
             var moviesByReviewer = _service.GetTopMoviesByReviewer(1);
             //Assert
-            Assert.True(moviesByReviewer.Count==3);
+            Assert.True(moviesByReviewer.ElementAt(0)==movieNo1);
+            Assert.True(moviesByReviewer.ElementAt(1)==movieNo2);
+            Assert.True(moviesByReviewer.ElementAt(2)==movieNo3);
         }
         
-        [Fact]
-        public void GetReviewersByMovie_ShouldReturn_AllReviewers_ThatRatedThatMovie()
+        [Theory]
+        [MemberData(nameof(GetTopMoviesByReviewerGenerator.AllMoviesReviewerHasViewed), MemberType = typeof(GetTopMoviesByReviewerGenerator))]
+        public void GetTopMoviesByReviewer_ShouldReturn_AllMoviesReviewerHasViewed(List<Review> list, int count)
         {
-            //Arrange
-            var rev1 = new Review
-            {
-                Grade = 2,
-                Movie = 1,
-                Reviewer = 1,
-                ReviewDate = new DateTime(2021, 4, 23)
-            };
-            var rev2 = new Review
-            {
-                Grade = 5,
-                Movie = 1,
-                Reviewer = 2,
-                ReviewDate = new DateTime(2021, 5, 23)
-            };
-            var rev3 = new Review
-            {
-                Grade = 3,
-                Movie = 1,
-                Reviewer = 3,
-                ReviewDate = new DateTime(2021, 2, 22)
-            };
-            var rev4 = new Review
-            {
-                Grade = 3,
-                Movie = 3,
-                Reviewer = 2,
-                ReviewDate = new DateTime(2021, 3, 12)
-            };
-            var list = new List<Review>()
-            {
-                rev1, rev2, rev3, rev4
-            };
+          
+            _mockRepo.Setup(x => x.ReadAll()).Returns(list);
+            //Act
+            var moviesByReviewer = _service.GetTopMoviesByReviewer(1);
+            //Assert
+            Assert.True(moviesByReviewer.Count==count);
+        }
+        
+        [Theory]
+        [MemberData(nameof(GetReviewersByMovieGenerator.AllReviewersTest), MemberType = typeof(GetReviewersByMovieGenerator))]
+        public void GetReviewersByMovie_ShouldReturn_AllReviewers_ThatRatedThatMovie(List<Review> list, int count)
+        {
             _mockRepo.Setup(x => x.ReadAll()).Returns(list);
             //Act
             var reviewersForMovie = _service.GetReviewersByMovie(1);
             //Assert
-            Assert.True(reviewersForMovie.Count==3);
+            Assert.True(reviewersForMovie.Count==count);
         }
         
-        [Fact]
-        public void GetReviewersByMovie_ShouldReturn_ListSortedIn_DescendingOrder()
+        [Theory]
+        [MemberData(nameof(GetReviewersByMovieGenerator.DescendingOrderTest), MemberType = typeof(GetReviewersByMovieGenerator))]
+        public void GetReviewersByMovie_ShouldReturn_ListSortedIn_DescendingOrder(List<Review> list,
+            int rev1, int rev2, int rev3)
         {
-            //Arrange
-            //before
-            var rev1 = new Review
-            {
-                Grade = 3,
-                Movie = 1,
-                Reviewer = 1,
-                ReviewDate = new DateTime(2021, 4, 23)
-            };
-            var rev2 = new Review
-            {
-                Grade = 5,
-                Movie = 1,
-                Reviewer = 2,
-                ReviewDate = new DateTime(2021, 5, 23)
-            };
-            var rev3 = new Review
-            {
-                Grade = 3,
-                Movie = 1,
-                Reviewer = 3,
-                ReviewDate = new DateTime(2021, 2, 22)
-            };
-            var rev4 = new Review
-            {
-                Grade = 3,
-                Movie = 3,
-                Reviewer = 2,
-                ReviewDate = new DateTime(2021, 3, 12)
-            };
-            var list = new List<Review>()
-            {
-                rev1, rev2, rev3, rev4
-            };
             _mockRepo.Setup(x => x.ReadAll()).Returns(list);
             //Act
             var reviewersForMovie = _service.GetReviewersByMovie(1);
             //Assert
-            Assert.True(reviewersForMovie.ElementAt(0)==rev2.Reviewer);
-            Assert.True(reviewersForMovie.ElementAt(1)==rev1.Reviewer);
-            Assert.True(reviewersForMovie.ElementAt(2)==rev3.Reviewer);
+            Assert.True(reviewersForMovie.ElementAt(0)==rev1);
+            Assert.True(reviewersForMovie.ElementAt(1)==rev2);
+            Assert.True(reviewersForMovie.ElementAt(2)==rev3);
         }
 
         #region Invalid Arguments
