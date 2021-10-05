@@ -7,6 +7,7 @@ using MovieRating.IServices;
 using MovieRating.Models;
 using MovieRating.Test.DataGenerators;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace MovieRating.Test
 {
@@ -35,9 +36,11 @@ namespace MovieRating.Test
             Assert.True(movies.ElementAt(1)==movNo2);
         }
         
+       
+        
         [Theory]
         [MemberData(nameof(GetTopRatedMoviesGenerator.SpecialCase), MemberType = typeof(GetTopRatedMoviesGenerator))]
-        public void GetTopRatedMovies_ShouldReturn_N_Movies_WithBestRating_TwoMoviesHaveTHisSameRating(List<Review> list, 
+        public void GetTopRatedMovies_ShouldReturn_N_Movies_WithBestRating_TwoMoviesHaveTHisSameRatingScore(List<Review> list, 
              int movNo1, int movNo2, int movNo3)
         {
             _mockRepo.Setup(x => x.ReadAll()).Returns(list);
@@ -47,7 +50,38 @@ namespace MovieRating.Test
             Assert.True(movies.ElementAt(0) ==movNo1);
             Assert.True(movies.ElementAt(1)==movNo2 ||movies.ElementAt(1)==movNo3 );
         }
+        
+        [Theory]
+        [MemberData(nameof(GetTopRatedMoviesGenerator.SpecialCase2), MemberType = typeof(GetTopRatedMoviesGenerator))]
+        public void GetTopRatedMovies_ShouldReturn_N_Movies_WithBestRating_TwoMoviesHaveTHisSameRatingScore2_NoDuplicates(List<Review> list, 
+            int movNo1, int movNo2, int movNo3)
+        {
+            _mockRepo.Setup(x => x.ReadAll()).Returns(list);
+            //Act
+            var movies = _service.GetTopRatedMovies(3);
+            //Assert
+            Assert.True(movies.ElementAt(0) ==movNo1 ||movies.ElementAt(0) == movNo2);
+            Assert.True(movies.ElementAt(1)==movNo2 ||movies.ElementAt(1)==movNo1 );
+            Assert.False(movies.ElementAt(2)==movNo2 ||  movies.ElementAt(2)==movNo1); // we wanna each movie appear only once
+            Assert.True(movies.ElementAt(2)==movNo3);
+        }
+        
+        [Fact]
+        public void GetTopRatedMovies_Should_Throw_Exception_WhenParameter_IsZeroOrLess()
+        {
+            _mockRepo.Setup(x => x.ReadAll()).Returns(new List<Review>());
+            void Act1() => _service.GetTopRatedMovies(0);
+            void Act2() => _service.GetTopRatedMovies(-10);
+            var exception1 = Assert.Throws<ArgumentException>(Act1);
+            var exception2 = Assert.Throws<ArgumentException>(Act2);
+            Assert.Equal("amount must be greater than 0", exception1.Message);
+            Assert.Equal("amount must be greater than 0", exception2.Message);
+        }
 
+        #region GetTopMoviesByReviewer
+
+        
+        
         [Theory]
         [MemberData(nameof(GetTopMoviesByReviewerGenerator.DataSpecialCase), MemberType = typeof(GetTopMoviesByReviewerGenerator))]
         public void GetTopMoviesByReviewer_ShouldReturn_MoviesSortedInDescendingOrderSpecialCase_ByRate_AndDate(
@@ -87,6 +121,8 @@ namespace MovieRating.Test
             Assert.True(moviesByReviewer.Count==count);
         }
         
+        #endregion
+        
         [Theory]
         [MemberData(nameof(GetReviewersByMovieGenerator.AllReviewersTest), MemberType = typeof(GetReviewersByMovieGenerator))]
         public void GetReviewersByMovie_ShouldReturn_AllReviewers_ThatRatedThatMovie(List<Review> list, int count)
@@ -114,17 +150,7 @@ namespace MovieRating.Test
 
         #region Invalid Arguments
 
-        [Fact]
-        public void GetTopRatedMovies_Should_Throw_Exception_WhenParameter_IsZeroOrLess()
-        {
-            _mockRepo.Setup(x => x.ReadAll()).Returns(new List<Review>());
-            void Act1() => _service.GetTopRatedMovies(0);
-            void Act2() => _service.GetTopRatedMovies(-10);
-            var exception1 = Assert.Throws<ArgumentException>(Act1);
-            var exception2 = Assert.Throws<ArgumentException>(Act2);
-            Assert.Equal("amount must be greater than 0", exception1.Message);
-            Assert.Equal("amount must be greater than 0", exception2.Message);
-        }
+        
 
         [Fact]
         public void GetTopMoviesByReviewer_ShouldThrowException_When_ReviewerDoesnt_Exist()
