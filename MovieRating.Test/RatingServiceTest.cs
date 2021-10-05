@@ -53,8 +53,8 @@ namespace MovieRating.Test
         
         [Theory]
         [MemberData(nameof(GetTopRatedMoviesGenerator.SpecialCase2), MemberType = typeof(GetTopRatedMoviesGenerator))]
-        public void GetTopRatedMovies_ShouldReturn_N_Movies_WithBestRating_TwoMoviesHaveTHisSameRatingScore2_NoDuplicates(List<Review> list, 
-            int movNo1, int movNo2, int movNo3)
+        public void GetTopRatedMovies_ShouldReturn_N_Movies_WithBestRating_TwoMoviesHaveTHisSameRatingScore2_NoDuplicates(
+            List<Review> list, int movNo1, int movNo2, int movNo3)
         {
             _mockRepo.Setup(x => x.ReadAll()).Returns(list);
             //Act

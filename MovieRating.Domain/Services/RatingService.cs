@@ -173,7 +173,7 @@ namespace MovieRating.Domain.Services
         {
             if (amount < 1)
                 throw new ArgumentException("amount must be greater than 0");
-            return _repo.ReadAll().GroupBy(i=> i.Movie).Select(y=> y.FirstOrDefault()).OrderByDescending(n => GetAverageRateOfMovie(n.Movie)).
+            return _repo.ReadAll().GroupBy(i=> i.Movie).Select(y=> y.First()).OrderByDescending(n => GetAverageRateOfMovie(n.Movie)).
                 ThenByDescending(n => n.ReviewDate).
                 Select(x => x.Movie).Take(amount).ToList();
         }
